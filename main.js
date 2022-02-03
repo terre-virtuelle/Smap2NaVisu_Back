@@ -12,6 +12,7 @@ const fs = require('fs');
 const { promisify } = require('util')
 // TO USE IT ASYNC maybe writeFileSync() is better
 const writeFileAsync = promisify(fs.writeFile)
+const readFileAsync = promisify(fs.readFile)
 
 // add it to allow files and not get a payload to long 413 error
 app.use(bodyParser.json({limit: '50mb'}));
@@ -28,36 +29,22 @@ app.listen(PORT_EXT, HOST_NAME, function () {
 
 
 router.route('/scenarios')
-    .get(function (req, res) {
-        //TODO
+    .get(async function (req, res) {
         const scenariosFolders = 'data/scenarios'
-       const scenariosData = fs.readdirSync(scenariosFolders).map(folder => {
-            console.log(folder);
-
-          const scenario =   fs.readdirSync(scenariosFolders+'/'+folder).map(subContent => {
-                console.log( 'folderContent      '   ,subContent);
-                if(subContent.includes('.json')){
-                    // need await
-                    const dataFormated =  {}
-                    fs.readFileSync(scenariosFolders+'/'+folder+'/'+subContent, (err, data) => {
-                        const dataFormated =  JSON.parse(data);
-                        console.log( 'dataFormated      '   ,dataFormated);
-
-                    })
-                    return dataFormated
-                }
-
-            })
-           console.log( 'scenario      '   ,scenario);
-
+       const scenariosData = fs.readdirSync(scenariosFolders).map(  folder => {
+           const scenario =  fs.readdirSync(scenariosFolders+'/'+folder).reduce( (acumulator,subContent) => {
+               if(subContent.includes('.json')){
+                   const data = fs.readFileSync(scenariosFolders+'/'+folder+'/'+subContent)
+                   const dataParsed = JSON.parse(data)
+                   dataParsed.title = folder
+                   // maybe get the files and change them in base 64 ?
+                   acumulator = {...acumulator,...dataParsed };
+               }
+               return acumulator
+           },{});
            return scenario
-
-
        });
-        console.log( 'scenariosData      '   ,scenariosData);
-
-        res.json({data : {},
-            methode: req.method});
+        res.json(scenariosData);
 
     })
     .post( async (req, res) => {
@@ -92,8 +79,7 @@ router.route('/scenarios')
                 return  { path: path , ...video}
             }));
         }
-        // stringify JSON Object to save it
-        var jsonContent = JSON.stringify(schema);
+        const jsonContent = JSON.stringify(schema);
         const fullPath = mainDirectoryName+'/'+req.body.fileName+'.json';
         await writeFileAsync( fullPath, jsonContent, 'utf8', function (err) {
             if (err) {
