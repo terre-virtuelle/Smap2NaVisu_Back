@@ -30,7 +30,7 @@ app.listen(PORT_EXT, HOST_NAME, function () {
 
 router.route('/scenarios')
     .get(async function (req, res) {
-        const scenariosFolders = 'data/scenarios'
+        const scenariosFolders = 'data/scenarios';
        const scenariosData = fs.readdirSync(scenariosFolders).map(  folder => {
            const scenario =  fs.readdirSync(scenariosFolders+'/'+folder).reduce( (acumulator,subContent) => {
                if(subContent.includes('.json')){
@@ -57,28 +57,30 @@ router.route('/scenarios')
             fs.mkdirSync(mainDirectoryName+'/images');
             fs.mkdirSync(mainDirectoryName+'/videos');
         }
-        if (schema.questions){
-            for (let i = 0; i < schema.questions.length; i++) {
-                const question = schema.questions[i];
+        if (schema.properties.questions){
+            for await (question of Object.values(schema.properties.questions)) {
+                //const question = schema.properties.questions[i];
                 // we need to separate the files
                 // after we save the files and we get te path of each file
                 // add the path to the questionnary
+                if (question.responses){
                 question.responses.Images = await Promise.all(question.responses.Images.map(async (image) => {
                     let base64Array = image.file.split(';base64,');
                     const type = base64Array[0].split('data:image/')[1];
-                    const path = mainDirectoryName+'/images/'+image.title+'.'+type;
+                    const path = mainDirectoryName + '/images/' + image.title + '.' + type;
                     await writeFileAsync(path, base64Array[1], {encoding: 'base64'});
                     delete image.file;
-                    return  { path: path , ...image}
+                    return {path: path, ...image}
                 }));
-                question.responses.Videos =  await Promise.all(question.responses.Videos.map(async (video) => {
+                question.responses.Videos = await Promise.all(question.responses.Videos.map(async (video) => {
                     let base64Array = video.file.split(';base64,');
                     const type = base64Array[0].split('data:video/')[1];
-                    const path = mainDirectoryName+'/videos/'+video.title+'.'+type;
+                    const path = mainDirectoryName + '/videos/' + video.title + '.' + type;
                     await writeFileAsync(path, base64Array[1], {encoding: 'base64'});
                     delete video.file;
-                    return  { path: path , ...video}
+                    return {path: path, ...video}
                 }));
+            }
             }
         }
         const jsonContent = JSON.stringify(schema);
@@ -91,6 +93,21 @@ router.route('/scenarios')
 
         res.json({data : req.body,
             methode: req.method});
+    })
+    .delete(function (req, res) {
+        const scenariosFolders = 'data/scenarios/';
+        let scenario = req.body;
+        let targetDir = scenariosFolders + scenario.title;
+        if (fs.existsSync(targetDir)){
+            fs.rmSync(targetDir, { recursive: true, force: true });
+            res.json('Scenario deleted');
+        }else {
+            res.json('Scenario not found');
+        }
+
+
+
+
     })
     .put(function (req, res) {
 
