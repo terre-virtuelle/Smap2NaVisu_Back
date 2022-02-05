@@ -49,6 +49,16 @@ router.route('/scenarios')
                                return image;
                            })
                        }
+                       if (reponseData.responses.Videos){
+                           reponseData.responses.Videos = reponseData.responses.Videos.map(video => {
+                               const video_in_base64  = fs.readFileSync(video.path, 'base64');
+                               // we must get the extension of file
+                               const fileExt = video.path.split('.')[1]
+                               video.file = 'data:image/'+fileExt+';base64,'+video_in_base64;
+                               delete video.path
+                               return video;
+                           })
+                       }
                        return reponseData;
                    })
                    // maybe get the files and change them in base 64 ?
