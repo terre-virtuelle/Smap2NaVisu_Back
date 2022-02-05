@@ -37,6 +37,20 @@ router.route('/scenarios')
                    const data = fs.readFileSync(scenariosFolders+'/'+folder+'/'+subContent)
                    const dataParsed = JSON.parse(data)
                    dataParsed.title = folder
+                   const reponsesData =  dataParsed.properties.questions.default
+                   dataParsed.properties.questions.default = reponsesData.map(reponseData => {
+                       if (reponseData.responses.Images){
+                           reponseData.responses.Images = reponseData.responses.Images.map(image => {
+                               const image_in_base64  = fs.readFileSync(image.path, 'base64');
+                               // we must get the extension of file
+                               const fileExt = image.path.split('.')[1]
+                               image.file = 'data:image/'+fileExt+';base64,'+image_in_base64;
+                               delete image.path
+                               return image;
+                           })
+                       }
+                       return reponseData;
+                   })
                    // maybe get the files and change them in base 64 ?
                    acumulator = {...acumulator,...dataParsed };
                }
@@ -59,8 +73,7 @@ router.route('/scenarios')
         }
         if (schema.properties.questions){
             let i = 0;
-            for await (question of Object.values(schema.properties.questions)) {
-                i++;
+            for await (question of schema.properties.questions.default) {
                 //const question = schema.properties.questions[i];
                 // we need to separate the files
                 // after we save the files and we get te path of each file
@@ -82,8 +95,10 @@ router.route('/scenarios')
                     delete video.file;
                     return {path: path, ...video}
                 }));
-                    schema.properties.questions = {...question};
-            }
+                    schema.properties.questions.default[i] = question;
+                    i++;
+
+                }
 
             }
         }
