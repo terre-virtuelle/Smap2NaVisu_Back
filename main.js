@@ -58,7 +58,9 @@ router.route('/scenarios')
             fs.mkdirSync(mainDirectoryName+'/videos');
         }
         if (schema.properties.questions){
+            let i = 0;
             for await (question of Object.values(schema.properties.questions)) {
+                i++;
                 //const question = schema.properties.questions[i];
                 // we need to separate the files
                 // after we save the files and we get te path of each file
@@ -80,7 +82,9 @@ router.route('/scenarios')
                     delete video.file;
                     return {path: path, ...video}
                 }));
+                    schema.properties.questions = {...question};
             }
+
             }
         }
         const jsonContent = JSON.stringify(schema);
@@ -96,8 +100,8 @@ router.route('/scenarios')
     })
     .delete(function (req, res) {
         const scenariosFolders = 'data/scenarios/';
-        let scenario = req.body;
-        let targetDir = scenariosFolders + scenario.title;
+        let scenarioName = req.body.title;
+        let targetDir = scenariosFolders + scenarioName;
         if (fs.existsSync(targetDir)){
             fs.rmSync(targetDir, { recursive: true, force: true });
             res.json('Scenario deleted');
