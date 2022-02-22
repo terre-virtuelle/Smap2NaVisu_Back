@@ -12,8 +12,36 @@ class ScenarioModel {
     getScenario() {
         return {origin: this.origin, date: this.date, bbox: this.bbox, questions: this.questions}
     }
-    formatFilesForres(){
 
+    formatForRes(){
+        this.questions = this.questions.map((question) => {
+            if (question.responses){
+                question.responses.Images = this.formatImagesForRes(question.responses.Images);
+                question.responses.Videos = this.formatVideosForRes(question.responses.Videos);
+            }
+        } )
+    }
+
+    formatImagesForRes(imagesArray){
+        return  imagesArray.map(image => {
+            const image_in_base64 = fs.readFileSync(image.path, 'base64');
+            // we must get the extension of file
+            const fileExt = image.path.split('.')[1]
+            image.file = 'data:image/' + fileExt + ';base64,' + image_in_base64;
+            delete image.path
+            return image;
+        })
+    }
+
+    formatVideosForRes(videosArray){
+        return  videosArray.map(video => {
+            const video_in_base64 = fs.readFileSync(video.path, 'base64');
+            // we must get the extension of file
+            const fileExt = video.path.split('.')[1]
+            video.file = 'data:image/' + fileExt + ';base64,' + video_in_base64;
+            delete video.path
+            return video;
+        })
     }
 
     save(fileName) {

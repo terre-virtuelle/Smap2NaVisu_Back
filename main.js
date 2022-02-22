@@ -34,40 +34,17 @@ router.route('/scenarios')
         // need change here
         const scenariosFolders = 'data/scenarios';
         const scenariosData = fs.readdirSync(scenariosFolders).map(folder => {
-            const scenario = fs.readdirSync(scenariosFolders + '/' + folder).reduce((acumulator, subContent) => {
+            const scenarioFiles = fs.readdirSync(scenariosFolders + '/' + folder).reduce((acumulator, subContent) => {
                 if (subContent.includes('.json')) {
                     const data = fs.readFileSync(scenariosFolders + '/' + folder + '/' + subContent)
-                    const dataParsed = JSON.parse(data)
-                    dataParsed.title = folder
-                    const reponsesData = dataParsed.questions
-                    dataParsed.questions = reponsesData.map(reponseData => {
-                        if (reponseData.responses.Images) {
-                            reponseData.responses.Images = reponseData.responses.Images.map(image => {
-                                const image_in_base64 = fs.readFileSync(image.path, 'base64');
-                                // we must get the extension of file
-                                const fileExt = image.path.split('.')[1]
-                                image.file = 'data:image/' + fileExt + ';base64,' + image_in_base64;
-                                delete image.path
-                                return image;
-                            })
-                        }
-                        if (reponseData.responses.Videos) {
-                            reponseData.responses.Videos = reponseData.responses.Videos.map(video => {
-                                const video_in_base64 = fs.readFileSync(video.path, 'base64');
-                                // we must get the extension of file
-                                const fileExt = video.path.split('.')[1]
-                                video.file = 'data:image/' + fileExt + ';base64,' + video_in_base64;
-                                delete video.path
-                                return video;
-                            })
-                        }
-                        return reponseData;
-                    })
-                    acumulator = {...acumulator, ...dataParsed};
+                    const scenarioObj = new ScenarioModel(JSON.parse(data))
+                    scenarioObj.formatForRes();
+                    scenarioObj.title = folder
+                    acumulator = {...acumulator, ...scenarioObj};
                 }
                 return acumulator
             }, {});
-            return scenario
+            return scenarioFiles
         });
         res.json(scenariosData);
 
