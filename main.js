@@ -10,6 +10,7 @@ var bodyParser = require("body-parser");
 
 const fs = require('fs');
 const {promisify} = require('util')
+const ScenarioModel =  require('./ScenarioModel.js')
 // TO USE IT ASYNC maybe writeFileSync() is better
 const writeFileAsync = promisify(fs.writeFile)
 const readFileAsync = promisify(fs.readFile)
@@ -30,6 +31,7 @@ app.listen(PORT_EXT, HOST_NAME, function () {
 
 router.route('/scenarios')
     .get(async function (req, res) {
+        // need change here
         const scenariosFolders = 'data/scenarios';
         const scenariosData = fs.readdirSync(scenariosFolders).map(folder => {
             const scenario = fs.readdirSync(scenariosFolders + '/' + folder).reduce((acumulator, subContent) => {
@@ -37,8 +39,8 @@ router.route('/scenarios')
                     const data = fs.readFileSync(scenariosFolders + '/' + folder + '/' + subContent)
                     const dataParsed = JSON.parse(data)
                     dataParsed.title = folder
-                    const reponsesData = dataParsed.properties.questions.default
-                    dataParsed.properties.questions.default = reponsesData.map(reponseData => {
+                    const reponsesData = dataParsed.questions
+                    dataParsed.questions = reponsesData.map(reponseData => {
                         if (reponseData.responses.Images) {
                             reponseData.responses.Images = reponseData.responses.Images.map(image => {
                                 const image_in_base64 = fs.readFileSync(image.path, 'base64');
@@ -61,7 +63,6 @@ router.route('/scenarios')
                         }
                         return reponseData;
                     })
-                    // maybe get the files and change them in base 64 ?
                     acumulator = {...acumulator, ...dataParsed};
                 }
                 return acumulator
@@ -71,60 +72,10 @@ router.route('/scenarios')
         res.json(scenariosData);
 
     })
-    .post(async (req, res) => {
-        let schema = req.body.data;
-        // first we need to create a direcory
-        const mainDirectoryName = 'data/scenarios/' + req.body.fileName
-        if (!fs.existsSync(mainDirectoryName)) {
-            fs.mkdirSync(mainDirectoryName, {recursive: true});
-            fs.mkdirSync(mainDirectoryName + '/images');
-            fs.mkdirSync(mainDirectoryName + '/videos');
-        } else {
-            //we can delete here all videos et photos files because if the file exist we do modification
-        }
-        if (schema.properties.questions) {
-            let i = 0;
-            for await (question of schema.properties.questions.default) {
-                // we need to separate the files
-                // after we save the files and we get te path of each file
-                // add the path to the questionnary
-                if (question.responses) {
-                    let imgIndex = 1;
-                    question.responses.Images = await Promise.all(question.responses.Images.map(async (image) => {
-                        let base64Array = image.file.split(';base64,');
-                        const type = base64Array[0].split('data:image/')[1];
-                        const imageName = 'img' + imgIndex
-                        const path = mainDirectoryName + '/images/' + imageName + '.' + type;
-                        await writeFileAsync(path, base64Array[1], {encoding: 'base64'});
-                        delete image.file;
-                        imgIndex++;
-                        return {path: path, ...image}
-                    }));
-                    let videoIndex = 1;
-                    question.responses.Videos = await Promise.all(question.responses.Videos.map(async (video) => {
-                        let base64Array = video.file.split(';base64,');
-                        const type = base64Array[0].split('data:video/')[1];
-                        const videoName = 'video' + videoIndex
-                        const path = mainDirectoryName + '/videos/' + videoName + '.' + type;
-                        await writeFileAsync(path, base64Array[1], {encoding: 'base64'});
-                        delete video.file;
-                        videoIndex++;
-                        return {path: path, ...video}
-                    }));
-                    schema.properties.questions.default[i] = question;
-                    i++;
-                }
-            }
-        }
-        const jsonContent = JSON.stringify(schema);
-        const fullPath = mainDirectoryName + '/' + req.body.fileName + '.json';
-        await writeFileAsync(fullPath, jsonContent, 'utf8', function (err) {
-            if (err) {
-                return console.log(err);
-            }
-        });
-
-        res.json({
+    .post((req, res) => {
+       const scenario = new ScenarioModel(req.body.data)
+        scenario.save(req.body.fileName);
+        return  res.json({
             data: req.body,
             methode: req.method
         });
@@ -150,8 +101,6 @@ router.route('/scenariosExport')
         if (!fs.existsSync(mainDirectoryName)) {
             res.json('scenario don"t exist');
         }
-
-
         return res.json({
             data: schema,
             methode: req.method
