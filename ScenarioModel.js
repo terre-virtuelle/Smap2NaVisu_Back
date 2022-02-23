@@ -1,7 +1,5 @@
 const fs = require('fs');
 
-
-
 class ScenarioModel {
     constructor(datas) {
         for (var data of Object.entries(datas)) {
