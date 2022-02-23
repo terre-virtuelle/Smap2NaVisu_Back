@@ -19,6 +19,7 @@ class ScenarioModel {
                 question.responses.Images = this.formatImagesForRes(question.responses.Images);
                 question.responses.Videos = this.formatVideosForRes(question.responses.Videos);
             }
+            return question;
         } )
     }
 

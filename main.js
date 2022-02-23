@@ -34,6 +34,7 @@ router.route('/scenarios')
         // need change here
         const scenariosFolders = 'data/scenarios';
         const scenariosData = fs.readdirSync(scenariosFolders).map(folder => {
+            // maybe a a filter is better
             const scenarioFiles = fs.readdirSync(scenariosFolders + '/' + folder).reduce((acumulator, subContent) => {
                 if (subContent.includes('.json')) {
                     const data = fs.readFileSync(scenariosFolders + '/' + folder + '/' + subContent)
