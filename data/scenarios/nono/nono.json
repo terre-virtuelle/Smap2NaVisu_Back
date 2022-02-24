@@ -1,0 +1,1 @@
+{"origin":"nono","date":{"Entrez la date :":""},"bbox":{"s":48.26,"w":-4.56,"n":48.43,"e":-4.3},"questions":[{"texte":"nono","balisage":"oui","target":"camera","cmd":"goTo","responses":{"texte":"","Images":[{"path":"data/scenarios/nono/images/img1.jpeg","description":"","position":{"lat":0,"lon":0}}],"Videos":[]}}]}
