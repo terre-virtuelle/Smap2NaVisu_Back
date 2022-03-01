@@ -2,9 +2,11 @@ const fs = require('fs');
 
 class ScenarioModel {
     constructor(datas) {
-        for (var data of Object.entries(datas)) {
-            this[data[0]] = data[1];
-        }
+        this.title = datas.title;
+        this.origin = datas.origin;
+        this.date = datas.date;
+        this.bbox = datas.bbox;
+        this.questions = datas.questions ? datas.questions :  [];
     }
 
     getScenario() {
@@ -13,9 +15,9 @@ class ScenarioModel {
 
     formatForRes(){
         this.questions = this.questions.map((question) => {
-            if (question.responses){
-                question.responses.Images = this.formatImagesForRes(question.responses.Images);
-                question.responses.Videos = this.formatVideosForRes(question.responses.Videos);
+            if (question.response){
+                question.response.Images = this.formatImagesForRes(question.response.Images);
+                question.response.Videos = this.formatVideosForRes(question.response.Videos);
             }
             return question;
         } )
@@ -62,9 +64,10 @@ class ScenarioModel {
 
     saveQuestions() {
             this.questions = this.questions.map((question) => {
-                if (question.responses) {
-                    question.responses.Images =  this.saveImages(question.responses.Images);
-                    question.responses.Videos =  this.saveVideos(question.responses.Videos);
+                if (question.response
+                ) {
+                    question.response.Images =  this.saveImages(question.response.Images);
+                    question.response.Videos =  this.saveVideos(question.response.Videos);
                 }
                 return question;
             } )
