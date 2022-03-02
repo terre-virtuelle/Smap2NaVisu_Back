@@ -40,7 +40,7 @@ router.route('/scenarios')
                     const data = fs.readFileSync(scenariosFolders + '/' + folder + '/' + subContent)
                     const scenarioObj = new ScenarioModel(JSON.parse(data))
                     scenarioObj.formatForRes();
-                    scenarioObj.title = folder
+                    scenarioObj.fileName = folder
                     acumulator = {...acumulator, ...scenarioObj};
                 }
                 return acumulator

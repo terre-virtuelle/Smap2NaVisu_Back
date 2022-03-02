@@ -2,15 +2,17 @@ const fs = require('fs');
 
 class ScenarioModel {
     constructor(datas) {
+        this.fileName = datas.fileName;
         this.title = datas.title;
         this.origin = datas.origin;
         this.date = datas.date;
         this.bbox = datas.bbox;
+        this.introduction = datas.introduction;
         this.questions = datas.questions ? datas.questions :  [];
     }
 
     getScenario() {
-        return {origin: this.origin, date: this.date, bbox: this.bbox, questions: this.questions}
+        return {fileName: this.fileName,title: this.title,origin: this.origin, date: this.date, bbox: this.bbox, introduction: this.introduction, questions: this.questions}
     }
 
     formatForRes(){
