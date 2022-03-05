@@ -9,6 +9,8 @@ class ScenarioModel {
         this.bbox = datas.bbox;
         this.introduction = datas.introduction;
         this.questions = datas.questions ? datas.questions :  [];
+        this.imgIndex = 1;
+        this.videoIndex = 1
     }
 
     getScenario() {
@@ -76,29 +78,27 @@ class ScenarioModel {
     }
 
     saveImages(imagesArray) {
-        let imgIndex = 1;
         return imagesArray.map( (image) => {
             let base64Array = image.file.split(';base64,');
             const type = base64Array[0].split('data:image/')[1];
-            const imageName = 'img' + imgIndex
+            const imageName = 'img' + this.imgIndex
             const path = this.mainDirectoryName + '/images/' + imageName + '.' + type;
             fs.writeFileSync(path, base64Array[1], {encoding: 'base64'});
             delete image.file;
-            imgIndex++;
+            this.imgIndex++;
             return {path: path, ...image}
         });
     }
 
     saveVideos(VideosArray) {
-        let videoIndex = 1;
         return  VideosArray.map((video) => {
             let base64Array = video.file.split(';base64,');
             const type = base64Array[0].split('data:video/')[1];
-            const videoName = 'video' + videoIndex
+            const videoName = 'video' + this.videoIndex
             const path = this.mainDirectoryName + '/videos/' + videoName + '.' + type;
             fs.writeFileSync(path, base64Array[1], {encoding: 'base64'});
             delete video.file;
-            videoIndex++;
+            this.videoIndex++;
             return {path: path, ...video}
         });
     }
