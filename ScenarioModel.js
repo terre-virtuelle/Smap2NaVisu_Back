@@ -11,6 +11,7 @@ class ScenarioModel {
         this.questions = datas.questions ? datas.questions :  [];
         this.imgIndex = 1;
         this.videoIndex = 1
+        this.cmd =  "scenario"
     }
 
     getScenario() {
