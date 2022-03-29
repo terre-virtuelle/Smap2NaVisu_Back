@@ -15,7 +15,7 @@ class ScenarioModel {
     }
 
     getScenario() {
-        return {fileName: this.fileName,title: this.title,origin: this.origin, date: this.date, bbox: this.bbox, introduction: this.introduction, questions: this.questions}
+        return {fileName: this.fileName,title: this.title,origin: this.origin, date: this.date, bbox: this.bbox, introduction: this.introduction, questions: this.questions, cmd:this.cmd}
     }
 
     formatForRes(){
