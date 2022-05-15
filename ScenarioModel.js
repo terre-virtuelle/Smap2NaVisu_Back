@@ -4,6 +4,7 @@ class ScenarioModel {
     constructor(datas) {
         this.fileName = datas.fileName;
         this.title = datas.title;
+        this.description = datas.description;
         this.origin = datas.origin;
         this.date = datas.date;
         this.bbox = datas.bbox;

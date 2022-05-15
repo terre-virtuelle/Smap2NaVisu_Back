@@ -3,7 +3,7 @@ var cors = require('cors')
 var HOST_NAME = 'localhost';
 var PORT_EXT = 3004;
 var app = express();
-
+const axios = require('axios').default;
 
 var router = express.Router();
 var bodyParser = require("body-parser");
@@ -76,6 +76,19 @@ router.route('/scenariosExport')
     .post(async (req, res) => {
         let schema = req.body.data;
         const mainDirectoryName = 'data/scenarios/' + req.body.fileName
+        const exportUrl = 'http://93.90.200.21:3003/export?cmd=scenario&origin=TV&target=' + req.body.fileName;
+        axios.get(exportUrl)
+            .then(function (response) {
+                // handle success
+                console.log(response);
+            })
+            .catch(function (error) {
+                // handle error
+                console.log(error);
+            })
+            .then(function () {
+                // always executed
+            });
         if (!fs.existsSync(mainDirectoryName)) {
             res.json('scenario don"t exist');
         }
