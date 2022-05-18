@@ -52,7 +52,7 @@ class ScenarioModel {
     }
 
     save(fileName) {
-        this.mainDirectoryName = 'data/scenarios/' + fileName;
+        this.mainDirectoryName = '../ApiRestNaVisu4D/ApiRestNaVisu4D/data/scenarios/' + fileName;
         this.checkDirectory();
          this.saveQuestions();
         const jsonContent = JSON.stringify(this.getScenario());

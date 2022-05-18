@@ -32,7 +32,7 @@ app.listen(PORT_EXT, HOST_NAME, function () {
 router.route('/scenarios')
     .get(async function (req, res) {
         // need change here
-        const scenariosFolders = 'data/scenarios';
+        const scenariosFolders = '../ApiRestNaVisu4D/ApiRestNaVisu4D/data/scenarios';
         const scenariosData = fs.readdirSync(scenariosFolders).map(folder => {
             // maybe a a filter is better
             const scenarioFiles = fs.readdirSync(scenariosFolders + '/' + folder).reduce((acumulator, subContent) => {
@@ -59,7 +59,7 @@ router.route('/scenarios')
         });
     })
     .delete(function (req, res) {
-        const scenariosFolders = 'data/scenarios/';
+        const scenariosFolders = '../ApiRestNaVisu4D/ApiRestNaVisu4D/data/scenarios/';
         let scenarioName = req.body.title;
         let targetDir = scenariosFolders + scenarioName;
         if (fs.existsSync(targetDir)) {
@@ -74,34 +74,32 @@ router.route('/scenarios')
 
 router.route('/scenariosExport')
     .post(async (req, res) => {
-        let schema = req.body.data;
-        const mainDirectoryName = 'data/scenarios/' + req.body.fileName
         const exportUrl = 'http://93.90.200.21:3003/export?cmd=scenario&origin=TV&target=' + req.body.fileName;
         axios.get(exportUrl)
             .then(function (response) {
                 // handle success
                 console.log(response);
+                return res.json({
+                    data: 'scenarioExported',
+                    methode: req.method
+                });
             })
             .catch(function (error) {
                 // handle error
                 console.log(error);
+                return res.json({
+                    data: 'eror',
+                    methode: req.method
+                });
             })
-            .then(function () {
-                // always executed
-            });
-        if (!fs.existsSync(mainDirectoryName)) {
-            res.json('scenario don"t exist');
-        }
-        return res.json({
-            data: schema,
-            methode: req.method
-        });
+
+
     })
 
 
 router.route('/scenarioFilesPath')
     .post((req, res) => {
-        const main_directory_name = 'data/scenarios/' + req.body.fileName;
+        const main_directory_name = '../ApiRestNaVisu4D/ApiRestNaVisu4D/data/scenarios/' + req.body.fileName;
         if (!fs.existsSync(main_directory_name)) {
             return res.json('scenario don"t exist');
         }
