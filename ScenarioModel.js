@@ -1,4 +1,5 @@
 const fs = require('fs');
+const {default: axios} = require("axios");
 
 class ScenarioModel {
     constructor(datas) {
@@ -16,7 +17,7 @@ class ScenarioModel {
     }
 
     getScenario() {
-        return {fileName: this.fileName,title: this.title,origin: this.origin, date: this.date, bbox: this.bbox, introduction: this.introduction, questions: this.questions, cmd:this.cmd}
+        return {fileName: this.fileName,title: this.title,description: this.description,origin: this.origin, date: this.date, bbox: this.bbox, introduction: this.introduction, questions: this.questions, cmd:this.cmd}
     }
 
     formatForRes(){
@@ -58,6 +59,7 @@ class ScenarioModel {
         const jsonContent = JSON.stringify(this.getScenario());
         const fullPath = this.mainDirectoryName + '/' + fileName + '.json';
         fs.writeFileSync(fullPath, jsonContent, 'utf8');
+        this.exportScenario();
     }
 
     checkDirectory() {
@@ -103,6 +105,27 @@ class ScenarioModel {
             this.videoIndex++;
             return {path: path, ...video}
         });
+    }
+    exportScenario(){
+        const exportUrl = 'http://93.90.200.21:3003/export?cmd=scenario&origin=TV&target=' + req.body.fileName;
+        axios.get(exportUrl)
+            .then(function (response) {
+                // handle success
+                console.log(response);
+                return res.json({
+                    data: 'scenarioExported',
+                    methode: req.method
+                });
+            })
+            .catch(function (error) {
+                // handle error
+                console.log(error);
+                return res.json({
+                    data: 'eror',
+                    methode: req.method
+                });
+            })
+
     }
 
 
