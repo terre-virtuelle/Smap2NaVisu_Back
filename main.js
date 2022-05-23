@@ -1,24 +1,18 @@
 const express = require('express');
-var cors = require('cors')
+var cors = require('cors');
 var HOST_NAME = 'localhost';
 var PORT_EXT = 3004;
 var app = express();
-const axios = require('axios').default;
-
 var router = express.Router();
 var bodyParser = require("body-parser");
-
 const fs = require('fs');
-const {promisify} = require('util')
-const ScenarioModel =  require('./ScenarioModel.js')
-// TO USE IT ASYNC maybe writeFileSync() is better
-const writeFileAsync = promisify(fs.writeFile)
-const readFileAsync = promisify(fs.readFile)
+const ScenarioModel = require('./ScenarioModel.js');
+const scenariosFolders = '../ApiRestNaVisu4D/ApiRestNaVisu4D/data/scenarios';
+
 
 // add it to allow files and not get a payload to long 413 error
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
-
 app.use(cors())
 app.options('*', cors());
 app.use(router);
@@ -32,34 +26,32 @@ app.listen(PORT_EXT, HOST_NAME, function () {
 router.route('/scenarios')
     .get(async function (req, res) {
         // need change here
-        const scenariosFolders = '../ApiRestNaVisu4D/ApiRestNaVisu4D/data/scenarios';
         const scenariosData = fs.readdirSync(scenariosFolders).map(folder => {
             // maybe a a filter is better
             const scenarioFiles = fs.readdirSync(scenariosFolders + '/' + folder).reduce((acumulator, subContent) => {
                 if (subContent.includes('.json')) {
                     const data = fs.readFileSync(scenariosFolders + '/' + folder + '/' + subContent)
-                    const scenarioObj = new ScenarioModel(JSON.parse(data))
+                    const scenarioObj = new ScenarioModel(JSON.parse(data));
                     scenarioObj.formatForRes();
-                    scenarioObj.fileName = folder
+                    scenarioObj.fileName = folder;
                     acumulator = {...acumulator, ...scenarioObj};
                 }
-                return acumulator
+                return acumulator;
             }, {});
-            return scenarioFiles
+            return scenarioFiles;
         });
         res.json(scenariosData);
 
     })
     .post((req, res) => {
-       const scenario = new ScenarioModel(req.body.data)
+        const scenario = new ScenarioModel(req.body.data)
         scenario.save(req.body.fileName);
-        return  res.json({
+        return res.json({
             data: req.body,
             methode: req.method
         });
     })
     .delete(function (req, res) {
-        const scenariosFolders = '../ApiRestNaVisu4D/ApiRestNaVisu4D/data/scenarios/';
         let scenarioName = req.body.title;
         let targetDir = scenariosFolders + scenarioName;
         if (fs.existsSync(targetDir)) {
@@ -72,34 +64,9 @@ router.route('/scenarios')
     .put(function (req, res) {
     });
 
-router.route('/scenariosExport')
-    .post(async (req, res) => {
-        const exportUrl = 'http://93.90.200.21:3003/export?cmd=scenario&origin=TV&target=' + req.body.fileName;
-        axios.get(exportUrl)
-            .then(function (response) {
-                // handle success
-                console.log(response);
-                return res.json({
-                    data: 'scenarioExported',
-                    methode: req.method
-                });
-            })
-            .catch(function (error) {
-                // handle error
-                console.log(error);
-                return res.json({
-                    data: 'eror',
-                    methode: req.method
-                });
-            })
-
-
-    })
-
-
 router.route('/scenarioFilesPath')
     .post((req, res) => {
-        const main_directory_name = '../ApiRestNaVisu4D/ApiRestNaVisu4D/data/scenarios/' + req.body.fileName;
+        const main_directory_name = scenariosFolders + '/' + req.body.fileName;
         if (!fs.existsSync(main_directory_name)) {
             return res.json('scenario don"t exist');
         }

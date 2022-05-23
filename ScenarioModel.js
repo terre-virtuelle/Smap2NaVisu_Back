@@ -10,44 +10,54 @@ class ScenarioModel {
         this.date = datas.date;
         this.bbox = datas.bbox;
         this.introduction = datas.introduction;
-        this.questions = datas.questions ? datas.questions :  [];
+        this.questions = datas.questions ? datas.questions : [];
         this.imgIndex = 1;
         this.videoIndex = 1
-        this.cmd =  "scenario"
+        this.cmd = "scenario"
     }
 
     getScenario() {
-        return {fileName: this.fileName,title: this.title,description: this.description,origin: this.origin, date: this.date, bbox: this.bbox, introduction: this.introduction, questions: this.questions, cmd:this.cmd}
+        return {
+            fileName: this.fileName,
+            title: this.title,
+            description: this.description,
+            origin: this.origin,
+            date: this.date,
+            bbox: this.bbox,
+            introduction: this.introduction,
+            questions: this.questions,
+            cmd: this.cmd
+        };
     }
 
-    formatForRes(){
+    formatForRes() {
         this.questions = this.questions.map((question) => {
-            if (question.response){
+            if (question.response) {
                 question.response.Images = this.formatImagesForRes(question.response.Images);
                 question.response.Videos = this.formatVideosForRes(question.response.Videos);
             }
             return question;
-        } )
+        })
     }
 
-    formatImagesForRes(imagesArray){
-        return  imagesArray.map(image => {
+    formatImagesForRes(imagesArray) {
+        return imagesArray.map(image => {
             const image_in_base64 = fs.readFileSync(image.path, 'base64');
             // we must get the extension of file
-            const fileExt = image.path.split('.')[1]
+            const fileExt = image.path.split('.')[1];
             image.file = 'data:image/' + fileExt + ';base64,' + image_in_base64;
-            delete image.path
+            delete image.path;
             return image;
         })
     }
 
-    formatVideosForRes(videosArray){
-        return  videosArray.map(video => {
+    formatVideosForRes(videosArray) {
+        return videosArray.map(video => {
             const video_in_base64 = fs.readFileSync(video.path, 'base64');
             // we must get the extension of file
-            const fileExt = video.path.split('.')[1]
+            const fileExt = video.path.split('.')[1];
             video.file = 'data:image/' + fileExt + ';base64,' + video_in_base64;
-            delete video.path
+            delete video.path;
             return video;
         })
     }
@@ -55,11 +65,11 @@ class ScenarioModel {
     save(fileName) {
         this.mainDirectoryName = '../ApiRestNaVisu4D/ApiRestNaVisu4D/data/scenarios/' + fileName;
         this.checkDirectory();
-         this.saveQuestions();
+        this.saveQuestions();
         const jsonContent = JSON.stringify(this.getScenario());
         const fullPath = this.mainDirectoryName + '/' + fileName + '.json';
         fs.writeFileSync(fullPath, jsonContent, 'utf8');
-        this.exportScenario();
+        this.exportScenario(fileName);
     }
 
     checkDirectory() {
@@ -71,21 +81,21 @@ class ScenarioModel {
     }
 
     saveQuestions() {
-            this.questions = this.questions.map((question) => {
-                if (question.response
-                ) {
-                    question.response.Images =  this.saveImages(question.response.Images);
-                    question.response.Videos =  this.saveVideos(question.response.Videos);
-                }
-                return question;
-            } )
+        this.questions = this.questions.map((question) => {
+            if (question.response
+            ) {
+                question.response.Images = this.saveImages(question.response.Images);
+                question.response.Videos = this.saveVideos(question.response.Videos);
+            }
+            return question;
+        })
     }
 
     saveImages(imagesArray) {
-        return imagesArray.map( (image) => {
+        return imagesArray.map((image) => {
             let base64Array = image.file.split(';base64,');
             const type = base64Array[0].split('data:image/')[1];
-            const imageName = 'img' + this.imgIndex
+            const imageName = 'img' + this.imgIndex;
             const path = this.mainDirectoryName + '/images/' + imageName + '.' + type;
             fs.writeFileSync(path, base64Array[1], {encoding: 'base64'});
             delete image.file;
@@ -95,10 +105,10 @@ class ScenarioModel {
     }
 
     saveVideos(VideosArray) {
-        return  VideosArray.map((video) => {
+        return VideosArray.map((video) => {
             let base64Array = video.file.split(';base64,');
             const type = base64Array[0].split('data:video/')[1];
-            const videoName = 'video' + this.videoIndex
+            const videoName = 'video' + this.videoIndex;
             const path = this.mainDirectoryName + '/videos/' + videoName + '.' + type;
             fs.writeFileSync(path, base64Array[1], {encoding: 'base64'});
             delete video.file;
@@ -106,24 +116,15 @@ class ScenarioModel {
             return {path: path, ...video}
         });
     }
-    exportScenario(){
-        const exportUrl = 'http://93.90.200.21:3003/export?cmd=scenario&origin=TV&target=' + req.body.fileName;
+
+    exportScenario(fileName) {
+        const exportUrl = 'http://93.90.200.21:3003/export?cmd=scenario&origin=TV&target=' + fileName;
         axios.get(exportUrl)
             .then(function (response) {
-                // handle success
                 console.log(response);
-                return res.json({
-                    data: 'scenarioExported',
-                    methode: req.method
-                });
             })
             .catch(function (error) {
-                // handle error
                 console.log(error);
-                return res.json({
-                    data: 'eror',
-                    methode: req.method
-                });
             })
 
     }
