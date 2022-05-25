@@ -7,7 +7,7 @@ var router = express.Router();
 var bodyParser = require("body-parser");
 const fs = require('fs');
 const ScenarioModel = require('./ScenarioModel.js');
-const scenariosFolders = '../ApiRestNaVisu4D/ApiRestNaVisu4D/data/scenarios';
+const scenariosFolders = '../ApiRestNaVisu4D/data/scenarios';
 
 
 // add it to allow files and not get a payload to long 413 error
