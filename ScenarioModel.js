@@ -15,7 +15,7 @@ class ScenarioModel {
         this.videoIndex = 1
         this.cmd = "scenario"
         this.scenariosFolders = scenariosFolders
-
+        console.log('this.scenariosFolders  ',this.scenariosFolders);
     }
 
     getScenario() {
