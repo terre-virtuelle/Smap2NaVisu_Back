@@ -1,6 +1,7 @@
 const express = require('express');
 var cors = require('cors');
-var HOST_NAME = 'localhost';
+//var HOST_NAME = 'localhost';
+var HOST_NAME = '93.90.200.21';
 var PORT_EXT = 3004;
 var app = express();
 var router = express.Router();
@@ -96,6 +97,4 @@ router.route('/dlFile')
         } else {
             return res.json('scenario don"t exist');
         }
-
-
     })
