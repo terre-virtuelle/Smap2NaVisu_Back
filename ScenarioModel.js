@@ -2,7 +2,7 @@ const fs = require('fs');
 const {default: axios} = require("axios");
 
 class ScenarioModel {
-    constructor(datas) {
+    constructor(datas,scenariosFolders) {
         this.fileName = datas.fileName;
         this.title = datas.title;
         this.description = datas.description;
@@ -14,6 +14,8 @@ class ScenarioModel {
         this.imgIndex = 1;
         this.videoIndex = 1
         this.cmd = "scenario"
+        this.scenariosFolders = scenariosFolders
+
     }
 
     getScenario() {
@@ -63,7 +65,7 @@ class ScenarioModel {
     }
 
     save(fileName) {
-        this.mainDirectoryName = '../ApiRestNaVisu4D/ApiRestNaVisu4D/data/scenarios/' + fileName;
+        this.mainDirectoryName = this.scenariosFolders + fileName;
         this.checkDirectory();
         this.saveQuestions();
         const jsonContent = JSON.stringify(this.getScenario());

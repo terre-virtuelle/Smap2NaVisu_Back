@@ -32,7 +32,7 @@ router.route('/scenarios')
             const scenarioFiles = fs.readdirSync(scenariosFolders + '/' + folder).reduce((acumulator, subContent) => {
                 if (subContent.includes('.json')) {
                     const data = fs.readFileSync(scenariosFolders + '/' + folder + '/' + subContent)
-                    const scenarioObj = new ScenarioModel(JSON.parse(data));
+                    const scenarioObj = new ScenarioModel(JSON.parse(data),scenariosFolders);
                     scenarioObj.formatForRes();
                     scenarioObj.fileName = folder;
                     acumulator = {...acumulator, ...scenarioObj};
@@ -45,7 +45,7 @@ router.route('/scenarios')
 
     })
     .post((req, res) => {
-        const scenario = new ScenarioModel(req.body.data)
+        const scenario = new ScenarioModel(req.body.data,scenariosFolders)
         scenario.save(req.body.fileName);
         return res.json({
             data: req.body,
