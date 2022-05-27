@@ -2,7 +2,7 @@ const fs = require('fs');
 const {default: axios} = require("axios");
 
 class ScenarioModel {
-    constructor(datas,scenariosFolders) {
+    constructor(datas, scenariosFolders) {
         this.fileName = datas.fileName;
         this.title = datas.title;
         this.description = datas.description;
@@ -42,35 +42,47 @@ class ScenarioModel {
     }
 
     formatImagesForRes(imagesArray) {
-        return imagesArray.map(image => {
-            const image_in_base64 = fs.readFileSync(image.path, 'base64');
-            // we must get the extension of file
-            const fileExt = image.path.split('.')[1];
-            image.file = 'data:image/' + fileExt + ';base64,' + image_in_base64;
-            delete image.path;
-            return image;
-        })
+        try {
+            return imagesArray.map(image => {
+                const image_in_base64 = fs.readFileSync(image.path, 'base64');
+                // we must get the extension of file
+                const fileExt = image.path.split('.')[1];
+                image.file = 'data:image/' + fileExt + ';base64,' + image_in_base64;
+                delete image.path;
+                return image;
+            })
+        } catch (er) {
+            console.log(er)
+        }
     }
 
     formatVideosForRes(videosArray) {
-        return videosArray.map(video => {
-            const video_in_base64 = fs.readFileSync('../ApiRestNaVisu4D'+video.path, 'base64');
-            // we must get the extension of file
-            const fileExt = video.path.split('.')[1];
-            video.file = 'data:image/' + fileExt + ';base64,' + video_in_base64;
-            delete video.path;
-            return video;
-        })
+        try {
+            return videosArray.map(video => {
+                const video_in_base64 = fs.readFileSync('../ApiRestNaVisu4D' + video.path, 'base64');
+                // we must get the extension of file
+                const fileExt = video.path.split('.')[1];
+                video.file = 'data:image/' + fileExt + ';base64,' + video_in_base64;
+                delete video.path;
+                return video;
+            })
+        } catch (er) {
+            console.log(er)
+        }
     }
 
     save(fileName) {
-        this.mainDirectoryName = this.scenariosFolders + '/' + fileName;
-        this.checkDirectory();
-        this.saveQuestions();
-        const jsonContent = JSON.stringify(this.getScenario());
-        const fullPath = this.mainDirectoryName + '/' + fileName + '.json';
-        fs.writeFileSync(fullPath, jsonContent, 'utf8');
-        this.exportScenario(fileName);
+        try {
+            this.mainDirectoryName = this.scenariosFolders + '/' + fileName;
+            this.checkDirectory();
+            this.saveQuestions();
+            const jsonContent = JSON.stringify(this.getScenario());
+            const fullPath = this.mainDirectoryName + '/' + fileName + '.json';
+            fs.writeFileSync(fullPath, jsonContent, 'utf8');
+            this.exportScenario(fileName);
+        } catch (er) {
+            console.log(er)
+        }
     }
 
     checkDirectory() {
