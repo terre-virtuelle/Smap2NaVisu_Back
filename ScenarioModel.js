@@ -15,7 +15,6 @@ class ScenarioModel {
         this.videoIndex = 1
         this.cmd = "scenario"
         this.scenariosFolders = scenariosFolders
-        console.log('this.scenariosFolders  ',this.scenariosFolders);
     }
 
     getScenario() {
@@ -55,7 +54,7 @@ class ScenarioModel {
 
     formatVideosForRes(videosArray) {
         return videosArray.map(video => {
-            const video_in_base64 = fs.readFileSync(video.path, 'base64');
+            const video_in_base64 = fs.readFileSync('../ApiRestNaVisu4D'+video.path, 'base64');
             // we must get the extension of file
             const fileExt = video.path.split('.')[1];
             video.file = 'data:image/' + fileExt + ';base64,' + video_in_base64;
@@ -71,7 +70,7 @@ class ScenarioModel {
         const jsonContent = JSON.stringify(this.getScenario());
         const fullPath = this.mainDirectoryName + '/' + fileName + '.json';
         fs.writeFileSync(fullPath, jsonContent, 'utf8');
-        this.exportScenario(fileName);
+        //this.exportScenario(fileName);
     }
 
     checkDirectory() {
