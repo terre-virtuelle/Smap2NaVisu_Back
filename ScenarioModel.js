@@ -65,6 +65,7 @@ class ScenarioModel {
 
     save(fileName) {
         this.mainDirectoryName = this.scenariosFolders + fileName;
+        console.log('this.mainDirectoryName    ',this.mainDirectoryName)
         this.checkDirectory();
         this.saveQuestions();
         const jsonContent = JSON.stringify(this.getScenario());
