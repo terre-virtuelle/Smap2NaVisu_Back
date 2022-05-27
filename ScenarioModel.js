@@ -70,7 +70,7 @@ class ScenarioModel {
         const jsonContent = JSON.stringify(this.getScenario());
         const fullPath = this.mainDirectoryName + '/' + fileName + '.json';
         fs.writeFileSync(fullPath, jsonContent, 'utf8');
-        //this.exportScenario(fileName);
+        this.exportScenario(fileName);
     }
 
     checkDirectory() {
