@@ -132,7 +132,7 @@ class ScenarioModel {
 
     exportScenario(fileName) {
         const exportUrl = 'http://93.90.200.21:3003/export?cmd=scenario&origin=TV&target=' + fileName;
-        axios.get(exportUrl)
+        axios.put(exportUrl)
             .then(function (response) {
                 console.log(response);
             })
