@@ -71,11 +71,11 @@ router.route('/scenarioFilesPath')
         if (!fs.existsSync(main_directory_name)) {
             return res.json('scenario don"t exist');
         }
-        if (!fs.existsSync(main_directory_name + '/' + req.body.fileName + '.pdf')) {
+        if (!fs.existsSync(main_directory_name + '/' + req.body.fileName + '/' + req.body.fileName + '.pdf')) {
             return res.json('scenario have no exports files');
         }
         let files_paths = {
-            'pdf': {'name': 'export', 'path': main_directory_name + '/' + req.body.fileName + '.pdf'},
+            'pdf': {'name': 'export', 'path': main_directory_name + '/' + req.body.fileName + '/' + req.body.fileName + '.pdf'},
             'img': [], 'videos': []
         }
         if (fs.existsSync(main_directory_name + '/images')) {
