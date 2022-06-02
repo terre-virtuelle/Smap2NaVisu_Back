@@ -71,7 +71,7 @@ class ScenarioModel {
         }
     }
 
-    save(fileName) {
+   async save(fileName) {
         try {
             this.mainDirectoryName = this.scenariosFolders + '/' + fileName;
             this.checkDirectory();
@@ -79,7 +79,7 @@ class ScenarioModel {
             const jsonContent = JSON.stringify(this.getScenario());
             const fullPath = this.mainDirectoryName + '/' + fileName + '.json';
             fs.writeFileSync(fullPath, jsonContent, 'utf8');
-            this.exportScenario(fileName);
+            await this.exportScenario(fileName);
         } catch (er) {
             console.log(er)
         }
@@ -105,19 +105,25 @@ class ScenarioModel {
     }
 
     saveImages(imagesArray) {
-        return imagesArray.map((image) => {
-            let base64Array = image.file.split(';base64,');
-            const type = base64Array[0].split('data:image/')[1];
-            const imageName = 'img' + this.imgIndex;
-            const path = this.mainDirectoryName + '/images/' + imageName + '.' + type;
-            fs.writeFileSync(path, base64Array[1], {encoding: 'base64'});
-            delete image.file;
-            this.imgIndex++;
-            return {path: path, ...image}
-        });
+        try {
+            return imagesArray.map((image) => {
+                let base64Array = image.file.split(';base64,');
+                const type = base64Array[0].split('data:image/')[1];
+                const imageName = 'img' + this.imgIndex;
+                const path = this.mainDirectoryName + '/images/' + imageName + '.' + type;
+                fs.writeFileSync(path, base64Array[1], {encoding: 'base64'});
+                delete image.file;
+                this.imgIndex++;
+                return {path: path, ...image}
+            });
+        }
+     catch (er) {
+        console.log(er)
+    }
     }
 
     saveVideos(VideosArray) {
+        try{
         return VideosArray.map((video) => {
             let base64Array = video.file.split(';base64,');
             const type = base64Array[0].split('data:video/')[1];
@@ -128,17 +134,15 @@ class ScenarioModel {
             this.videoIndex++;
             return {path: path, ...video}
         });
+        } catch (er) {
+            console.log(er)
+        }
     }
 
-    exportScenario(fileName) {
+    async exportScenario(fileName) {
         const exportUrl = 'http://93.90.200.21:3003/export?cmd=scenario&origin=TV&target=' + fileName;
-        axios.put(exportUrl)
-            .then(function (response) {
-                console.log('exportScenario  response ',response);
-            })
-            .catch(function (error) {
-                console.log('exportScenario  error ',error);
-            })
+       await axios.put(exportUrl);
+
 
     }
 

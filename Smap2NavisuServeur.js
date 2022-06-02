@@ -25,7 +25,7 @@ app.listen(PORT_EXT, HOST_NAME, function () {
 
 
 router.route('/scenarios')
-    .get(async function (req, res) {
+    .get(async (req, res) => {
         // need change here
         const scenariosData = fs.readdirSync(scenariosFolders).map(folder => {
             // maybe a a filter is better
@@ -44,9 +44,9 @@ router.route('/scenarios')
         res.json(scenariosData);
 
     })
-    .post((req, res) => {
+    .post(async (req, res) => {
         const scenario = new ScenarioModel(req.body.data,scenariosFolders)
-        scenario.save(req.body.fileName);
+       await  scenario.save(req.body.fileName);
         return res.json({
             data: req.body,
             methode: req.method
